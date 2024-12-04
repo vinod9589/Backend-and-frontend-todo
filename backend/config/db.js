@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
-
+mongoose.set('strictQuery', false);
 const connectDB = () => {
     mongoose
         .connect(process.env.mongoURI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+
         })
         .then(() => console.log("MongoDB Connected"))
         .catch((err) => {

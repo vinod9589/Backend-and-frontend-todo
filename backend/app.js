@@ -9,8 +9,6 @@ connectDB();
 app.use(cors());
 app.use(express.json({ extended: false, limit: "50mb" }));
 
-/
-
 app.use("/api/todo", require("./routes/todo"));
 app.use("/api/testing", require("./routes/testing"));
 
