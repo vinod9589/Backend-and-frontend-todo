@@ -1,5 +1,6 @@
 import React, { createContext, useState } from "react";
 import axios from "axios";
+import { use } from "react";
 
 export const MyData = createContext();
 function MyContext({ children }) {
@@ -12,19 +13,21 @@ function MyContext({ children }) {
     department: "",
     salary: "",
   });
- 
+
+  const [postdatatodo, setPostDataTodo] = useState({});
+  const [listtodo, setListTodo] = useState([]);
 
   const handlePostData = () => {
     axios.post("http://localhost:5001/api/testing", postdata).then(() => {
       console.log("Data successfully posted");
-      handleGetData(); 
+      handleGetData();
       setPostData({
         fristname: "",
         lastname: "",
         gmail: "",
         department: "",
         salary: "",
-      }); 
+      });
     });
   };
 
@@ -48,15 +51,53 @@ function MyContext({ children }) {
       });
   };
 
+  const handlePostDataTodo = () => {
+    axios.post("http://localhost:5001/api/todo", postdatatodo).then(() => {
+      console.log("Data successfully posted");
+      setPostData({
+        title: "",
+        discription: "",
+      });
+    });
+  };
+
+  const handleGetDataTodo = () => {
+    axios
+      .get("http://localhost:5001/api/todo")
+      .then((res) => setListTodo(res.data.data));
+  };
+
+  const handleDeleteDataTodo = (x) => {
+    axios
+      .delete("http://localhost:5001/api/todo/" + x)
+      .then((res) => handleGetDataTodo(res.data.data));
+  };
+  const handleUpdateDataTodo = () => {
+    axios
+      .put("http://localhost:5001/api/Todo/" + id, postdatatodo)
+      .then((res) => {
+        handleGetDataTodo();
+        setPostDataTodo();
+      });
+  };
+
   return (
     <MyData.Provider
       value={{
         postdata,
+        postdatatodo,
+        setListTodo,
+        listtodo,
+        setPostDataTodo,
         setPostData,
         handlePostData,
         handleGetData,
         handleDeleteData,
         handleUpdateData,
+        handleDeleteDataTodo,
+        handleUpdateDataTodo,
+        handleGetDataTodo,
+        handlePostDataTodo,
         list,
         id,
         setId,

@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
   try {
     const todo = new Todo(req.body);
     const newtodo = await todo.save();
-    
+
     res.status(200).json({
       data: newtodo,
     });
@@ -52,9 +52,13 @@ router.put("/:id", async (req, res) => {
     if (!todo) {
       return res.status(400).json({ message: "Todo does not exist" });
     }
-    todo.name = req.body.name || todo.name;
-    todo.number = req.body.number || todo.number;
-    todo.age = req.body.age || todo.age;
+    todo.fristname = req.body.fristname || todo.fristname;
+    todo.lastname = req.body.lastname || todo.lastname;
+    todo.email = req.body.email || todo.email;
+    todo.department = req.body.department || todo.department;
+
+    todo.salary = req.body.salary || todo.salary;
+
  
     
     const updatedUser = await todo.save();

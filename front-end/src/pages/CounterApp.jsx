@@ -11,7 +11,7 @@ function CounterApp() {
     <>
       <div
         className="container-fluid text-center justify-content-center align-items-center d-flex "
-        style={{ height: "91vh" }}
+        style={{ height: "90vh" }}
       >
         <div className="shadow bg-white px-5 py-5 card  ">
           <h1>Counter App</h1>
