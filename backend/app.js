@@ -10,8 +10,11 @@ app.use(cors());
 app.use(express.json({ extended: false, limit: "50mb" }));
 
 app.use("/api/testing", require("./routes/testing"));
-app.use("/api/todo", require("./routes/todo"));
 app.use("/api/signin", require("./routes/signin"));
+app.use("/api/tasktodo", require("./routes/tasktodo"));
+app.use("/api/logintodo", require("./routes/logintodo"));
+
+
 
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import ListIcon from "@mui/icons-material/List";
 import AddTaskIcon from "@mui/icons-material/AddTask";
@@ -16,6 +16,8 @@ import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
+import { useContext } from "react";
+import { MyData } from "../contextapi/MyContext";
 
 const style = {
   position: "absolute",
@@ -31,62 +33,61 @@ const style = {
 };
 
 function Todo() {
+  const {
+    handleDeleteDataTodo,
+    handleUpdateDataTodo,
+    handleGetDataTodo,
+    handlePostDataTodo,
+    postdatatodo,
+    setPostDataTodo,
+    id,
+    setId,
+    listtodo,
+  } = useContext(MyData);
+
+  useEffect(() => {
+    handleGetDataTodo();
+  }, [listtodo]);
+
   const [open, setOpen] = useState(false);
-  const [taskTitle, setTaskTitle] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
-  const [tasks, setTasks] = useState({ todo: [], inProgress: [], completed: [] });
   const [editingTask, setEditingTask] = useState(null);
   const navigate = useNavigate();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setTaskTitle("");
-    setTaskDescription("");
     setEditingTask(null);
   };
 
-  // const handleCreateTask = () => {
-  //   const newTask = {
-  //     title: taskTitle,
-  //     description: taskDescription,
-  //     id: Date.now(),
-  //   };
-  //   if (editingTask) {
-     
-  //     setTasks((prevTasks) => ({
-  //       ...prevTasks,
-  //       todo: prevTasks.todo.map((task) =>
-  //         task.id === editingTask.id ? newTask : task
-  //       ),
-  //     }));
-  //   } else {
-  
-  //     setTasks((prevTasks) => ({
-  //       ...prevTasks,
-  //       todo: [...prevTasks.todo, newTask],
-  //     }));
-  //   }
-  //   handleClose();
-  // };
+  const handleEdit = (task) => {
+    setId(task._id);
+    setPostDataTodo({
+      title: task.title || "",
+      discription: task.discription || "",
+    });
+    setEditingTask(task);
+    setOpen(true);
+  };
 
-  // const handleEditTask = (task) => {
-  //   setEditingTask(task);
-  //   setTaskTitle(task.title);
-  //   setTaskDescription(task.description);
-  //   handleOpen();
-  // };
-
-  // const handleDeleteTask = (taskId) => {
-  //   setTasks((prevTasks) => ({
-  //     ...prevTasks,
-  //     todo: prevTasks.todo.filter((task) => task.id !== taskId),
-  //   }));
-  // };
+  const handleSave = () => {
+    if (editingTask) {
+      if (!id) {
+        console.error("Cannot update task without an ID");
+        return;
+      }
+      handleUpdateDataTodo(postdatatodo);
+    } else {
+      if (!postdatatodo.title || !postdatatodo.discription) {
+        console.error("Cannot create task without title or description");
+        return;
+      }
+      handlePostDataTodo(postdatatodo);
+    }
+    handleClose();
+  };
 
   return (
     <>
-     
       <Modal
         open={open}
         onClose={handleClose}
@@ -106,8 +107,10 @@ function Todo() {
                 id="task-title"
                 label="Task Title"
                 variant="outlined"
-                value={taskTitle}
-                onChange={(e) => setTaskTitle(e.target.value)}
+                value={postdatatodo?.title}
+                onChange={(e) =>
+                  setPostDataTodo({ ...postdatatodo, title: e.target.value })
+                }
               />
               <TextField
                 fullWidth
@@ -117,13 +120,18 @@ function Todo() {
                 multiline
                 rows={4}
                 variant="outlined"
-                value={taskDescription}
-                onChange={(e) => setTaskDescription(e.target.value)}
+                value={postdatatodo?.discription}
+                onChange={(e) =>
+                  setPostDataTodo({
+                    ...postdatatodo,
+                    discription: e.target.value,
+                  })
+                }
               />
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleCreateTask}
+                onClick={handleSave}
                 style={{ marginTop: "16px" }}
               >
                 {editingTask ? "Update Task" : "Create Task"}
@@ -133,7 +141,6 @@ function Todo() {
         </Fade>
       </Modal>
 
-    
       <div className="container-fluid text-center mt-4">
         <h2>Todo</h2>
 
@@ -148,50 +155,129 @@ function Todo() {
             </IconButton>
           </div>
 
-          <div className="row d-flex justify-content-around ">
-           
+          <div className="row d-flex justify-content-around">
+            {/* Todo Column */}
             <div className="col-md-3 col-sm-6 shadow p-3 mb-3">
               <div className="d-flex justify-content-center align-items-center border border-primary py-2">
                 <ListIcon className="text-primary" fontSize="large" />
                 <span className="px-2 fs-5">Todo</span>
               </div>
-              {tasks.todo.length === 0 ? (
-                <p>No tasks available</p>
-              ) : (
-                tasks.todo.map((task) => (
-                  <Card key={task.id} style={{ marginTop: "10px" }}>
+
+              {listtodo
+                .filter((task) => task.status === "todo")
+                .map((task) => (
+                  <Card
+                    key={task._id}
+                    className="border border-primary"
+                    style={{ marginTop: "10px" }}
+                  >
                     <CardContent>
                       <Typography variant="h6">{task.title}</Typography>
                       <Typography variant="body2" color="textSecondary">
-                        {task.description}
+                        {task.discription}
                       </Typography>
-                      <div style={{ marginTop: "10px", display: "flex", justifyContent: "space-between" }}>
-                        <IconButton onClick={() => handleEditTask(task)} color="primary">
-                          <EditIcon />
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <IconButton color="primary">
+                          <EditIcon onClick={() => handleEdit(task)} />
                         </IconButton>
-                        <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary">
+                        <IconButton
+                          onClick={() => handleDeleteDataTodo(task._id)}
+                          color="secondary"
+                        >
                           <DeleteIcon />
                         </IconButton>
                       </div>
                     </CardContent>
                   </Card>
-                ))
-              )}
+                ))}
             </div>
 
-            
+            {/* In Progress Column */}
             <div className="col-md-3 col-sm-6 shadow p-3 mb-3">
               <div className="d-flex justify-content-center align-items-center border border-primary py-2">
                 <CloudSyncIcon className="text-danger" fontSize="large" />
                 <span className="px-2 fs-5">In Progress</span>
               </div>
+              {listtodo
+                .filter((task) => task.status === "in-progress")
+                .map((task) => (
+                  <Card
+                    key={task._id}
+                    className="border border-primary"
+                    style={{ marginTop: "10px" }}
+                  >
+                    <CardContent>
+                      <Typography variant="h6">{task.title}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {task.discription}
+                      </Typography>
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <IconButton color="primary">
+                          <EditIcon onClick={() => handleEdit(task)} />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteDataTodo(task._id)}
+                          color="secondary"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
 
+            {/* Completed Column */}
             <div className="col-md-3 col-sm-6 shadow p-3 mb-3">
               <div className="d-flex justify-content-center align-items-center border border-primary py-2">
                 <AddTaskIcon className="text-success" fontSize="large" />
                 <span className="px-2 fs-5">Completed</span>
               </div>
+              {listtodo
+                .filter((task) => task.status === "completed")
+                .map((task) => (
+                  <Card
+                    key={task._id}
+                    className="border border-primary"
+                    style={{ marginTop: "10px" }}
+                  >
+                    <CardContent>
+                      <Typography variant="h6">{task?.title}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {task?.discription}
+                      </Typography>
+                      <div
+                        style={{
+                          marginTop: "10px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <IconButton color="primary">
+                          <EditIcon onClick={() => handleEdit(task)} />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteDataTodo(task._id)}
+                          color="secondary"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           </div>
         </div>

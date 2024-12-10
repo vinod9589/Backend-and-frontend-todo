@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./Login.css";
 import PersonIcon from "@mui/icons-material/Person";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { MyData } from "../contextapi/MyContext";
+import { useNavigate } from "react-router-dom";
 function SignUp() {
+  const { handlePostDataSignUP, postdatasignup, setPostDataSignUp } =
+    useContext(MyData);
+    const navigate = useNavigate()
   return (
     <>
       <div className="container-fluid bg-info d-flex justify-content-center  align-items-center img-fluid login-ui-main text-white  ">
@@ -32,6 +37,13 @@ function SignUp() {
                   type="text"
                   name=""
                   id=""
+                  value={postdatasignup.fristname}
+                  onChange={(e) =>
+                    setPostDataSignUp({
+                      ...postdatasignup,
+                      fristname: e.target.value,
+                    })
+                  }
                 />
                 <PersonIcon />
               </div>
@@ -47,6 +59,13 @@ function SignUp() {
                   type="text"
                   name=""
                   id=""
+                  value={postdatasignup.lastname}
+                  onChange={(e) =>
+                    setPostDataSignUp({
+                      ...postdatasignup,
+                      lastname: e.target.value,
+                    })
+                  }
                 />
                 <PersonIcon />
               </div>
@@ -62,6 +81,13 @@ function SignUp() {
                   type="text"
                   name=""
                   id=""
+                  value={postdatasignup.email}
+                  onChange={(e) =>
+                    setPostDataSignUp({
+                      ...postdatasignup,
+                      email: e.target.value,
+                    })
+                  }
                 />
                 <MailOutlineIcon />
               </div>
@@ -77,18 +103,27 @@ function SignUp() {
                   type="text"
                   name=""
                   id=""
+                  value={postdatasignup.password}
+                  onChange={(e) =>
+                    setPostDataSignUp({
+                      ...postdatasignup,
+                      password: e.target.value,
+                    })
+                  }
                 />
                 <LockOpenIcon />
               </div>
             </div>
-            
 
-            <div className="text-center bg-danger rounded-3 py-2 mt-3">
-              <button className="bg-transparent border-0 text-white  ">
+            <div    onClick={() => {handlePostDataSignUP();navigate("/Login")}} className="text-center bg-danger rounded-3 py-2 mt-3">
+              <button
+             
+                className="bg-transparent border-0 text-white  "
+              >
                 Submit
               </button>
             </div>
-            <div className="mt-2">Already have Account? Login</div>
+            <div onClick={()=>navigate("/login")} className="mt-2">Already have Account? Login</div>
           </div>
         </div>
       </div>
